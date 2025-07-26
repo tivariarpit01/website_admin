@@ -3,7 +3,7 @@
 import Message from "../models/messageModel.js";
 import Project from "../models/projectModel.js";
 import Service from "../models/Service.js";
-import Team from "../models/teamModel.js";
+import Team from "../models/TeamModel.js";
 import Blog from "../models/blogModel.js";
 
 export const getDashboardStats = async (req, res) => {
