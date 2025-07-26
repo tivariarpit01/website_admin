@@ -4,7 +4,7 @@ import Message from "../models/messageModel.js";
 import Project from "../models/projectModel.js";
 import Service from "../models/Service.js";
 import Team from "../models/TeamModel.js";
-import Blog from "../models/blogModel.js";
+import Blog from "../models/BlogModel.js";
 
 export const getDashboardStats = async (req, res) => {
   try {
