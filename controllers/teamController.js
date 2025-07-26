@@ -1,5 +1,5 @@
 // controllers/teamController.js
-import Team from "../models/TeamModel.js";
+import Team from "../models/TeamModel";
 
 export const createTeamMember = async (req, res) => {
   try {
