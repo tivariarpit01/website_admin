@@ -1,6 +1,6 @@
 import Project from "../models/ProjectModel.js";
 
-// 📦 CREATE Project
+// 📦 CREATE Projects
 export const createProject = async (req, res) => {
   try {
     const { title, description, github, liveDemo, techStack, status } = req.body;
