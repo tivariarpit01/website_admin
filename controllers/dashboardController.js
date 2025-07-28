@@ -1,5 +1,5 @@
 import Message from "../models/messageModel.js";
-import Project from "../models/ProjectModel.js"; // ✅ Matches filename
+import Project from "../models/projectModel.js"; // ✅ Matches filename
 import Service from "../models/Service.js";
 import Team from "../models/TeamModel.js";
 import Blog from "../models/BlogModel.js";

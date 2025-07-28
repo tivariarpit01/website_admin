@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import Message from "../models/messageModel.js";
-import Project from "../models/ProjectModel.js";
+import Project from "../models/projectModel.js";
 import XLSX from "xlsx";
 import fs, { writeFileSync, unlink } from "fs";
 import path from "path";
