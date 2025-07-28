@@ -5,9 +5,11 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
+
+// 🧠 Custom MongoDB Connect
+import connectDB from "./config/db.js";
 
 // 📦 ROUTES
 import blogRoutes from "./routes/blogRoutes.js";
@@ -20,11 +22,11 @@ import authRoutes from "./routes/adminRoutes.js";
 import exportRoutes from "./routes/exportRoutes.js";
 
 dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 9002;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/qurilo";
 
-// Needed for ES Modules
+// 📂 Needed for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -60,15 +62,18 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// 🚀 Connect to MongoDB and Start Server
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log("✅ Connected to MongoDB");
-    app.listen(PORT, () =>
-      console.log(`🚀 Server running at: http://localhost:${PORT}`)
-    );
-  })
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err);
-    process.exit(1);
+// 🚀 Start the Server After MongoDB Connection
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running at: http://localhost:${PORT}`);
   });
+}).catch((err) => {
+  console.error("❌ Failed to connect to MongoDB:", err.message);
+  process.exit(1);
+});
+
+// 💣 Handle Unhandled Promise Rejections
+process.on("unhandledRejection", (err) => {
+  console.error("💥 Unhandled Rejection:", err);
+  process.exit(1);
+});
