@@ -1,15 +1,14 @@
 // routes/exportRoutes.js
 import express from "express";
-import { exportMessagesToExcel } from "../controllers/exportController.js";
-import { protect, admin } from "../middleware/authMiddleware.js";
+import {
+  exportMessagesToExcel,
+  exportProjectsToExcel,
+} from "../controllers/exportController.js";
+import { protect } from "../middleware/authMiddleware.js"; // If you're using auth
 
 const router = express.Router();
 
-router.get("/messages/export", protect, admin, exportMessagesToExcel);
+router.get("/messages", protect, exportMessagesToExcel);
+router.get("/projects", protect, exportProjectsToExcel);
 
 export default router;
-
-
-// server.js or index.js - ADD this import with existing routes
-import exportRoutes from "./routes/exportRoutes.js";
-app.use("/api", exportRoutes);

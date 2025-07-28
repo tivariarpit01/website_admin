@@ -1,5 +1,5 @@
-// routes/teamRoutes.js
 import express from "express";
+import upload from "../middleware/multerMiddleware.js"; // your multer setup
 import {
   createTeamMember,
   getTeamMembers,
@@ -9,9 +9,10 @@ import {
 
 const router = express.Router();
 
-router.post("/", createTeamMember);
+router.post("/", upload.single("image"), createTeamMember);
+// image field name should match
 router.get("/", getTeamMembers);
-router.put("/:id", updateTeamMember);
+router.put("/:id", upload.single("image"), updateTeamMember);
 router.delete("/:id", deleteTeamMember);
 
 export default router;

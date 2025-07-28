@@ -1,40 +1,94 @@
-// controllers/projectController.js
-import Project from "../models/projectModel.js";
+import Project from "../models/ProjectModel.js";
 
+// 📦 CREATE Project
 export const createProject = async (req, res) => {
   try {
-    const project = await Project.create(req.body);
-    res.status(201).json(project);
+    const { title, description, github, liveDemo, techStack, status } = req.body;
+
+    if (!title || !description) {
+      return res.status(400).json({ error: "Title and description are required." });
+    }
+
+    const image = req.file ? req.file.path.replace(/\\/g, "/") : "";
+
+    const newProject = await Project.create({
+      title: title.trim(),
+      description,
+      github: github?.trim(),
+      liveDemo: liveDemo?.trim(),
+      techStack: techStack ? JSON.parse(techStack) : [],
+      image,
+      status: status || "pending", // default handled in model too
+    });
+
+    res.status(201).json({ success: true, message: "✅ Project created", data: newProject });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("❌ Project Create Error:", err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
+// 📥 GET All Projects
 export const getProjects = async (req, res) => {
   try {
-    const projects = await Project.find();
-    res.status(200).json(projects);
+    const projects = await Project.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: projects });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("❌ Get Projects Error:", err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
+// ✏️ UPDATE Project
 export const updateProject = async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
+    const { title, description, github, liveDemo, techStack, status } = req.body;
+
+    const updatedData = {
+      ...(title && { title: title.trim() }),
+      ...(description && { description }),
+      ...(github && { github: github.trim() }),
+      ...(liveDemo && { liveDemo: liveDemo.trim() }),
+      ...(status && { status }),
+      ...(techStack && {
+        techStack: Array.isArray(techStack)
+          ? techStack
+          : JSON.parse(techStack),
+      }),
+    };
+
+    if (req.file) {
+      updatedData.image = req.file.path.replace(/\\/g, "/");
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(req.params.id, updatedData, {
       new: true,
+      runValidators: true,
     });
-    res.status(200).json(project);
+
+    if (!updatedProject) {
+      return res.status(404).json({ success: false, error: "Project not found." });
+    }
+
+    res.status(200).json({ success: true, message: "✅ Project updated", data: updatedProject });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("❌ Project Update Error:", err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
+// ❌ DELETE Project
 export const deleteProject = async (req, res) => {
   try {
-    await Project.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Project deleted" });
+    const deleted = await Project.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: "Project not found." });
+    }
+
+    res.status(200).json({ success: true, message: "🗑️ Project deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("❌ Project Delete Error:", err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 };

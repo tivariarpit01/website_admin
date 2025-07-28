@@ -11,6 +11,13 @@ const blogSchema = new mongoose.Schema({
     required: true,
   },
   author: String,
+  image: {
+    type: String, // image filename or URL
+  },
+  tags: {
+    type: [String], // array of tags
+    default: [],
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -18,5 +25,4 @@ const blogSchema = new mongoose.Schema({
 });
 
 const Blog = mongoose.models.Blog || mongoose.model("Blog", blogSchema);
-
 export default Blog;
