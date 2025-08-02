@@ -1,3 +1,5 @@
+// models/Service.js
+
 import mongoose from "mongoose";
 
 const serviceSchema = new mongoose.Schema({
@@ -5,22 +7,16 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
   description: {
     type: String,
     required: true,
   },
-
-  icon: {
+  
+  image: {
     type: String,
-    required: false,
+    required: true,
   },
+}, { timestamps: true });
 
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-const Service = mongoose.model("Service", serviceSchema);
+const Service = mongoose.models.Service || mongoose.model("Service", serviceSchema);
 export default Service;

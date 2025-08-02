@@ -3,22 +3,25 @@ import Service from "../models/Service.js";
 // ✅ Create
 export const createService = async (req, res) => {
   try {
-    const { title, description, icon } = req.body;
+    const { title, description } = req.body;
 
-    if (!title || !description || !icon) {
-      return res.status(400).json({ message: "All fields are required" });
+    // Check if an image was uploaded
+    if (!req.file) {
+      return res.status(400).json({ message: "Image is required" });
+    }
+    
+    // Get the path of the uploaded file
+    const image = req.file.path.replace(/\\/g, "/");
+
+    if (!title || !description) {
+      return res.status(400).json({ message: "Title and description are required" });
     }
 
-    console.log("🚀 Incoming service:", { title, description, icon });
-    console.log("🔐 Admin (from token):", req.admin); // if you're using protect middleware
-
-    const service = new Service({ title, description, icon });
+    const service = new Service({ title, description, image });
     await service.save();
 
-    console.log("✅ Service created:", service);
     res.status(201).json(service);
   } catch (err) {
-    console.error("🔥 Service creation error:", err);
     res.status(500).json({ message: "Failed to create service", error: err.message });
   }
 };
@@ -48,11 +51,17 @@ export const getServiceById = async (req, res) => {
 // ✅ Update
 export const updateService = async (req, res) => {
   try {
-    const { title, description, icon } = req.body;
+    const { title, description } = req.body;
+    const updateData = { title, description };
+
+    // If a new file is uploaded, add its path to the update data
+    if (req.file) {
+      updateData.image = req.file.path.replace(/\\/g, "/");
+    }
 
     const updated = await Service.findByIdAndUpdate(
       req.params.id,
-      { title, description, icon },
+      updateData,
       { new: true }
     );
 

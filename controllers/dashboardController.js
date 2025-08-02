@@ -1,4 +1,4 @@
-import Message from "../models/messageModel.js";
+
 import Project from "../models/projectModel.js"; // ✅ Matches filename
 import Service from "../models/Service.js";
 import Team from "../models/TeamModel.js";
@@ -16,8 +16,6 @@ export const getDashboardStats = async (req, res) => {
     const past7Days = getPastDate(7);
 
     const [
-      totalMessages,
-      recentMessages,
       totalProjects,
       workingProjects,
       pendingProjects,
@@ -26,9 +24,7 @@ export const getDashboardStats = async (req, res) => {
       totalTeam,
       totalBlogs
     ] = await Promise.all([
-      Message.countDocuments(),
-      Message.countDocuments({ date: { $gte: past7Days } }),
-
+      
       Project.countDocuments(),
       Project.countDocuments({ status: "working" }),
       Project.countDocuments({ status: "pending" }),
@@ -43,10 +39,6 @@ export const getDashboardStats = async (req, res) => {
       success: true,
       message: "Dashboard stats fetched successfully",
       data: {
-        messages: {
-          total: totalMessages,
-          last7Days: recentMessages
-        },
         projects: {
           total: totalProjects,
           working: workingProjects,

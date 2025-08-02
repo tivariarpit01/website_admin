@@ -1,18 +1,12 @@
 import express from "express";
-import upload from "../middleware/multerMiddleware.js"; // your multer setup
-import {
-  createTeamMember,
-  getTeamMembers,
-  updateTeamMember,
-  deleteTeamMember,
-} from "../controllers/teamController.js";
+import { createTeamMember, getAllTeamMembers, deleteTeamMember, updateTeamMember } from "../controllers/teamController.js";
+import { teamUpload } from "../middleware/multerMiddleware.js"; 
 
 const router = express.Router();
 
-router.post("/", upload.single("image"), createTeamMember);
-// image field name should match
-router.get("/", getTeamMembers);
-router.put("/:id", upload.single("image"), updateTeamMember);
+router.post("/", teamUpload.single("image"), createTeamMember);
+router.get("/", getAllTeamMembers);
 router.delete("/:id", deleteTeamMember);
+router.put("/:id", teamUpload.single("image"), updateTeamMember); // if you're updating
 
 export default router;

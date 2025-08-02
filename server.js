@@ -15,15 +15,13 @@ import connectDB from "./config/db.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
-import messageRoutes from "./routes/messageRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import authRoutes from "./routes/adminRoutes.js";
-import exportRoutes from "./routes/exportRoutes.js";
 
 dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 9002;
+const PORT = process.env.PORT || 8000;
 
 // 📂 Needed for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -31,11 +29,14 @@ const __dirname = path.dirname(__filename);
 
 // ✅ CORS Setup — allow frontend to connect
 app.use(cors({
-  origin: '*', // Allow all origins (you can change this to frontend URL later)
+  origin: 'http://localhost:9002', // frontend URL
+  credentials: true, // THIS is important for cookies/headers
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  // credentials: true, // Use this + specific origin if you're using cookies
 }));
+
+
+
 
 // 🛡️ Security middleware
 app.use(helmet());
@@ -58,10 +59,9 @@ app.use("/api/admin", authRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/team", teamRoutes);
-app.use("/api/messages", messageRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/export", exportRoutes);
+
 
 // 🔚 404 Handler
 app.use((req, res) => {

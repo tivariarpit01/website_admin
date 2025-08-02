@@ -1,92 +1,111 @@
 import Team from "../models/TeamModel.js";
+import fs from "fs";
 import path from "path";
 
-// 🔥 CREATE
+// 🧠 Helper to clean image path (convert backslashes to slashes)
+const normalizePath = (filePath) => filePath.replace(/\\/g, "/");
+
+// ✅ Create
 export const createTeamMember = async (req, res) => {
   try {
     const { name, role, bio, linkedin, twitter } = req.body;
 
     if (!name || !role) {
-      return res.status(400).json({ error: "Name and Role are required." });
+      return res.status(400).json({ message: "Name and Role are required." });
     }
 
-    const image = req.file ? req.file.path.replace(/\\/g, "/") : "";
+    if (!req.file) {
+      return res.status(400).json({ message: "Image is required." });
+    }
 
-    const newMember = await Team.create({
+    const image = normalizePath(req.file.path);
+
+    const newMember = new Team({
       name,
       role,
-      bio,
       image,
+      bio,
       socials: {
         linkedin: linkedin || "",
         twitter: twitter || "",
       },
     });
 
-    res.status(201).json(newMember);
+    await newMember.save();
+    res.status(201).json({ message: "Team member created", member: newMember });
   } catch (err) {
-    console.error("❌ Create error:", err.message);
-    res.status(500).json({ error: "Failed to create team member." });
+    console.error("❌ Error creating team member:", err.message);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
-// 📥 GET ALL
-export const getTeamMembers = async (req, res) => {
+// ✅ Read All
+export const getAllTeamMembers = async (req, res) => {
   try {
-    const members = await Team.find();
+    const members = await Team.find().sort({ createdAt: -1 });
     res.status(200).json(members);
   } catch (err) {
-    console.error("❌ Fetch error:", err.message);
-    res.status(500).json({ error: "Failed to fetch team members." });
+    console.error("❌ Error fetching team members:", err.message);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
-// ✏️ UPDATE
+// ✅ Read One
+export const getSingleTeamMember = async (req, res) => {
+  try {
+    const member = await Team.findById(req.params.id);
+    if (!member) return res.status(404).json({ message: "Team member not found" });
+
+    res.status(200).json(member);
+  } catch (err) {
+    console.error("❌ Error fetching team member:", err.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// ✅ Update
 export const updateTeamMember = async (req, res) => {
   try {
     const { name, role, bio, linkedin, twitter } = req.body;
 
-    const updateData = {
-      ...(name && { name }),
-      ...(role && { role }),
-      ...(bio && { bio }),
-      socials: {
-        linkedin: linkedin || "",
-        twitter: twitter || "",
-      },
-    };
+    const member = await Team.findById(req.params.id);
+    if (!member) return res.status(404).json({ message: "Team member not found" });
 
     if (req.file) {
-      updateData.image = req.file.path.replace(/\\/g, "/");
+      if (member.image && fs.existsSync(member.image)) {
+        fs.unlinkSync(member.image);
+      }
+      member.image = normalizePath(req.file.path);
     }
 
-    const updated = await Team.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-    });
+    member.name = name || member.name;
+    member.role = role || member.role;
+    member.bio = bio || member.bio;
+    member.socials.linkedin = linkedin || member.socials.linkedin;
+    member.socials.twitter = twitter || member.socials.twitter;
 
-    if (!updated) {
-      return res.status(404).json({ error: "Team member not found." });
-    }
-
-    res.status(200).json(updated);
+    await member.save();
+    res.status(200).json({ message: "Team member updated", member });
   } catch (err) {
-    console.error("❌ Update error:", err.message);
-    res.status(500).json({ error: "Failed to update team member." });
+    console.error("❌ Error updating team member:", err.message);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
-// ❌ DELETE
+// ✅ Delete
 export const deleteTeamMember = async (req, res) => {
   try {
-    const deleted = await Team.findByIdAndDelete(req.params.id);
+    const member = await Team.findById(req.params.id);
+    if (!member) return res.status(404).json({ message: "Team member not found" });
 
-    if (!deleted) {
-      return res.status(404).json({ error: "Team member not found." });
+    if (member.image && fs.existsSync(member.image)) {
+      fs.unlinkSync(member.image);
     }
 
-    res.status(200).json({ message: "Team member deleted successfully." });
+    await member.deleteOne();
+    res.status(200).json({ message: "Team member deleted" });
   } catch (err) {
-    console.error("❌ Delete error:", err.message);
-    res.status(500).json({ error: "Failed to delete team member." });
+    console.error("❌ Error deleting team member:", err.message);
+    res.status(500).json({ message: "Server Error" });
   }
 };
