@@ -1,6 +1,6 @@
 import express from "express";
 import { createTeamMember, getAllTeamMembers, deleteTeamMember, updateTeamMember } from "../controllers/teamController.js";
-import { teamUpload } from "../middleware/multerMiddleware.js"; 
+import { teamUpload } from "../middleware/cloudinaryUpload.js"; 
 
 const router = express.Router();
 

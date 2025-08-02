@@ -1,5 +1,5 @@
 import express from "express";
-import { serviceUpload } from "../middleware/multerMiddleware.js";
+import { serviceUpload } from "../middleware/cloudinaryUpload.js";
 import {
   createService,
   getAllServices,

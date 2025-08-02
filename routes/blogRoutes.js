@@ -1,5 +1,5 @@
 import express from "express";
-import { blogUpload } from "../middleware/multerMiddleware.js";
+import { blogUpload } from "../middleware/cloudinaryUpload.js";
 import {
   createBlog,
   getAllBlogs,
