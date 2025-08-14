@@ -3,23 +3,22 @@ import Service from "../models/Service.js";
 // ✅ Create
 export const createService = async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, features, technologies, cta } = req.body;
 
-    // Check if an image was uploaded
-    if (!req.file) {
-      return res.status(400).json({ message: "Image is required" });
-    }
-    
-    // Get the path of the uploaded file
+    if (!req.file) return res.status(400).json({ message: "Image is required" });
+
     const image = req.file.path.replace(/\\/g, "/");
 
-    if (!title || !description) {
-      return res.status(400).json({ message: "Title and description are required" });
-    }
+    const service = new Service({
+      title,
+      description,
+      image,
+      features: features ? JSON.parse(features) : [],
+      technologies: technologies ? JSON.parse(technologies) : [],
+      cta: cta ? JSON.parse(cta) : undefined
+    });
 
-    const service = new Service({ title, description, image });
     await service.save();
-
     res.status(201).json(service);
   } catch (err) {
     res.status(500).json({ message: "Failed to create service", error: err.message });
@@ -49,12 +48,21 @@ export const getServiceById = async (req, res) => {
 };
 
 // ✅ Update
+// ✅ Update
+// ✅ Update
 export const updateService = async (req, res) => {
   try {
-    const { title, description } = req.body;
-    const updateData = { title, description };
+    const { title, description, features, technologies, cta } = req.body;
+    const updateData = {};
 
-    // If a new file is uploaded, add its path to the update data
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+
+    // Parse JSON strings from Postman
+    if (features) updateData.features = JSON.parse(features);
+    if (technologies) updateData.technologies = JSON.parse(technologies);
+    if (cta) updateData.cta = JSON.parse(cta);
+
     if (req.file) {
       updateData.image = req.file.path.replace(/\\/g, "/");
     }
@@ -65,12 +73,19 @@ export const updateService = async (req, res) => {
       { new: true }
     );
 
-    if (!updated) return res.status(404).json({ message: "Service not found" });
+    if (!updated) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
     res.json(updated);
   } catch (err) {
-    res.status(500).json({ message: "Failed to update service", error: err.message });
+    res.status(500).json({
+      message: "Failed to update service",
+      error: err.message
+    });
   }
 };
+
 
 // ✅ Delete
 export const deleteService = async (req, res) => {
