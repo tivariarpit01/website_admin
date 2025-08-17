@@ -28,12 +28,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ✅ CORS Setup — allow frontend to connect
-app.use(cors({
-  origin: 'http://localhost:9002', // frontend URL
-  credentials: true, // THIS is important for cookies/headers
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:9002",
+      "https://sutra-iq-website-i3fi.vercel.app",
+      "https://sutraiq.com" ,
+    ],
+    credentials: true, // ✅ cookies / headers ke liye
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+;
 
 
 
