@@ -31,9 +31,9 @@ const __dirname = path.dirname(__filename);
 app.use(
   cors({
     origin: [
+      "https://www.sutraiq.com",
       "http://localhost:9002",
-      "https://sutra-iq-website-i3fi.vercel.app",
-      "https://sutraiq.com" ,
+    
     ],
     credentials: true, // ✅ cookies / headers ke liye
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
